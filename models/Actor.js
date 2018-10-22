@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const Actor = new Schema({
   actorName: String,
   actorDescription: String,
-  userStoreis: [String]
+  userStoreis: [{type: mongoose.Schema.Types.ObjectId, ref: 'UserStory'}]
 });
 
 

@@ -4,12 +4,14 @@ const router = express.Router();
 const Version = require('../models/Version');
 const Project = require('../models/Project');
 const Actor = require('../models/Actor');
+const UserStory = require('../models/UserStories');
 
 router.use(function timeLog(req, res, next) {
   console.log('Time: ', Date.now())
   next()
 })
 
+//  === getting all actors ===
 
 router.get('/allActors/:versionId', function (req, res) {
   Version.findById(req.params.versionId, (err, version) => {
@@ -31,6 +33,8 @@ router.get('/allActors/:versionId', function (req, res) {
     }
   })
   });
+
+  // === creating new actor ===
 
   router.put('/:versionID', function (req, res) {
 
@@ -57,42 +61,37 @@ router.get('/allActors/:versionId', function (req, res) {
             res.send(err);
           }
         });
-
       }
     })
- 
 });
 
-  router.put('/editActor/:versionID', function (req, res) {
+
+  // === edit actor ===
+
+  router.put('/editActor/:actorID', function (req, res) {
 
     let { actorName, actorDescription } = req.body;
 
-    Version.findById(req.params.versionID, (err, newVersion) => {
-      console.log("newVersion", newVersion);
-
+    Actor.findById(req.params.actorID, (err, actor) => {
+      
       if (!err) {
-        const newActor = new Actor({
-          actorName: actorName,
-          actorDescription: actorDescription,
-          userStoreis: []
-        })
+        console.log("actor", actor);
+        actor.set({ actorName: actorName , actorDescription : actorDescription });
 
-        newActor.save((err, project) => {
+        actor.save((err, project) => {
           if (!err) {
-            newVersion.allActors.push(newActor);
-            newVersion.save((err, project) => {
-              res.send('new actor added');
 
-            })
-          } else {
+              res.send('actor updated');
+            } else {
             res.send(err);
           }
         });
 
       }
     })
- 
 });
+
+// === deletting actor === 
 
 router.delete('/:versionId/:location', function (req, res) {
   Version.findById(req.params.versionId, (err, version) => {
@@ -106,6 +105,7 @@ router.delete('/:versionId/:location', function (req, res) {
     });
   })
 });
+
 
 router.delete('/:actorId', function (req, res) {
   Actor.findByIdAndDelete(req.params.actorId, (err, actor) => {

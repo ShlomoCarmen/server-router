@@ -4,11 +4,16 @@ const router = express.Router();
 const Project = require('../models/Project');
 const Actor = require('../models/Actor');
 const Version = require('../models/Version');
+const UserStory = require('../models/UserStories');
 
 router.use(function timeLog(req, res, next) {
     console.log('Time: ', Date.now())
     next()
 })
+
+
+
+// === posting new project ====> will creat 3 collections in the DB ===
 
 router.post("/newProject", function (req, res) {
     let firstProject = new Project({
@@ -65,27 +70,37 @@ router.post("/newProject", function (req, res) {
     })
 });
 
+//=== getting all data of current version of specific project ===
+
 router.get('/allData/:projctId', function (req, res) {
     Project.findOne({_id: req.params.projctId})
     .populate("allVersions").exec((err, project) => {
         if (!err) {
-            console.log(project.allVersions[project.allVersions.length -1]);
+            // console.log(project.allVersions[project.allVersions.length -1]);
             Version.findOne({_id: project.allVersions[project.allVersions.length -1]})
             .populate("allActors").exec((err, project)=>{
                 if (!err) {
-                    console.log("aaaaaaaaaaaa", project);
-                    
-                    res.send(project);
+                    console.log(project.allActors);
+                    Actor.find({_id: project.allActors})
+                    .populate("userStoreis").exec((err, userStory)=>{
+                        if(!err){
+                            res.send(userStory);
+                        }else{
+                            res.send(err);
+                        }
+                    })
                 }else{
                     res.send(err);
                 }
             })
-            
+
         } else {
             res.send(err);
         }
     })
 });
+
+// === creating new version ===
 
 router.put('/newVersion/:projctId', function (req, res) {
     Project.findOne({_id: req.params.projctId})
@@ -115,6 +130,7 @@ router.put('/newVersion/:projctId', function (req, res) {
     })
 });
 
+//=== getting all projects ===> returns all the names and id's of all projects  ===
 
 router.get('/allProjects', function (req, res) {
     Project.find({}, "projectName", (err, newProject) => {
