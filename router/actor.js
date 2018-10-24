@@ -6,10 +6,10 @@ const Project = require('../models/Project');
 const Actor = require('../models/Actor');
 const UserStory = require('../models/UserStories');
 
-router.use(function timeLog(req, res, next) {
-  console.log('hallo Shlomo ☺')
-  next()
-})
+// router.use(function timeLog(req, res, next) {
+//   console.log('hallo Shlomo ☺')
+//   next()
+// })
 
 //  === getting all actors ===
 

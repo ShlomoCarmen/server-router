@@ -8,7 +8,10 @@ const Version = new Schema({
   projectDescription: String,
   projectName: String,
   versionNumber: Number,
-  subjects: [Object],
+  subjects: [{
+    title: String,
+    subject: String
+  }],
   assumptions: [String],
   date: { type: Date, default: Date.now },
   allActors: [{type: mongoose.Schema.Types.ObjectId, ref: 'Actor'}]

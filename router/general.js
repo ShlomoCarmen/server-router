@@ -6,11 +6,11 @@ const Project = require('../models/Project');
 const Actor = require('../models/Actor');
 const UserStory = require('../models/UserStories');
 
-router.use(function timeLog(req, res, next) {
-    console.log('hallo Shlomo ☺')
+// router.use(function timeLog(req, res, next) {
+//     console.log('hallo Shlomo ☺')
 
-    next()
-})
+//     next()
+// })
 
 // === ading project description to correct version === 
 
@@ -62,6 +62,25 @@ router.put('/assumptions/:versionId', function (req, res) {
             version.save((err, project) => {
                 if (!err) {
                     res.send("assumptions added");
+                } else {
+                    res.send(err);
+                }
+            })
+        } else {
+            res.send(err);
+        }
+    })
+});
+
+// === ading subjects to correct version ===
+
+router.put('/subjects/:versionId', function (req, res) {
+    Version.findById(req.params.versionId, (err, version) => {
+        if (!err) {
+            version.set({ subjects: req.body.subjects });
+            version.save((err, project) => {
+                if (!err) {
+                    res.send("subjects added");
                 } else {
                     res.send(err);
                 }

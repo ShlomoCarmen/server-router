@@ -6,11 +6,11 @@ const Actor = require('../models/Actor');
 const Version = require('../models/Version');
 const UserStory = require('../models/UserStories');
 
-router.use(function timeLog(req, res, next) {
-    console.log('hallo Shlomo ☺')
+// router.use(function timeLog(req, res, next) {
+//     console.log('hallo Shlomo ☺')
 
-    next()
-})
+//     next()
+// })
 
 
 // === posting new project ====> will creat 3 collections in the DB ===
@@ -29,6 +29,7 @@ router.post("/newProject", function (req, res) {
                 editorName: req.body.editorName,
                 projectName: req.body.projectName,
                 assumptions: [],
+                subjects: [],
                 projectDescription: '',
                 versionNumber: 1,
                 allActors: []
@@ -92,6 +93,7 @@ router.put('/newVersion/:projctId', function (req, res) {
             versionNumber: correntVersion.versionNumber + 1,
             allActors: correntVersion.allActors,
             assumptions: correntVersion.assumptions,
+            subjects: correntVersion.subjects,
 
         })
 
