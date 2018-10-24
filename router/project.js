@@ -7,10 +7,10 @@ const Version = require('../models/Version');
 const UserStory = require('../models/UserStories');
 
 router.use(function timeLog(req, res, next) {
-    console.log('Time: ', Date.now())
+    console.log('hallo Shlomo ☺')
+
     next()
 })
-
 
 
 // === posting new project ====> will creat 3 collections in the DB ===
@@ -27,6 +27,7 @@ router.post("/newProject", function (req, res) {
             const version = new Version({
                 rejectionExplenation: "",
                 editorName: req.body.editorName,
+                projectName: req.body.projectName,
                 assumptions: [],
                 projectDescription: '',
                 versionNumber: 1,
@@ -48,22 +49,6 @@ router.post("/newProject", function (req, res) {
                 }
             });
             
-            const actor = new Actor({
-                actorName: "",
-                actorDescription: "",
-                userStoreis: []
-            });
-
-            actor.save((err, actor) => {
-                if (!err) {
-                    version.allActors.push(actor);
-                    version.save((err, version) => {
-                          res.send(version);
-                    })
-                }
-            })
-
-
         } else {
             res.send(err);
         }
@@ -80,15 +65,8 @@ router.get('/allData/:projctId', function (req, res) {
             Version.findOne({_id: project.allVersions[project.allVersions.length -1]})
             .populate("allActors").exec((err, project)=>{
                 if (!err) {
-                    console.log(project.allActors);
-                    Actor.find({_id: project.allActors})
-                    .populate("userStoreis").exec((err, userStory)=>{
-                        if(!err){
-                            res.send(userStory);
-                        }else{
-                            res.send(err);
-                        }
-                    })
+                    res.send(project);
+                   
                 }else{
                     res.send(err);
                 }
@@ -108,6 +86,7 @@ router.put('/newVersion/:projctId', function (req, res) {
         const correntVersion = project.allVersions[project.allVersions.length - 1];
         const version = new Version({
             rejectionExplenation: "",
+            projectName: correntVersion.projectName,
             editorName: req.body.editorName,
             projectDescription: correntVersion.projectDescription,
             versionNumber: correntVersion.versionNumber + 1,

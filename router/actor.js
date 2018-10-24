@@ -7,7 +7,7 @@ const Actor = require('../models/Actor');
 const UserStory = require('../models/UserStories');
 
 router.use(function timeLog(req, res, next) {
-  console.log('Time: ', Date.now())
+  console.log('hallo Shlomo ☺')
   next()
 })
 
@@ -32,91 +32,111 @@ router.get('/allActors/:versionId', function (req, res) {
       res.send(err);
     }
   })
-  });
+});
 
-  // === creating new actor ===
+// === creating new actor ===
 
-  router.put('/:versionID', function (req, res) {
+router.put('/:versionID', function (req, res) {
 
-    let { actorName, actorDescription } = req.body;
+  let { actorName, actorDescription } = req.body;
 
-    Version.findById(req.params.versionID, (err, newVersion) => {
-      console.log("newVersion", newVersion);
+  Version.findById(req.params.versionID, (err, newVersion) => {
+    console.log("newVersion", newVersion);
 
-      if (!err) {
-        const newActor = new Actor({
-          actorName: actorName,
-          actorDescription: actorDescription,
-          userStoreis: []
-        })
+    if (!err) {
 
-        newActor.save((err, project) => {
-          if (!err) {
-            newVersion.allActors.push(newActor);
-            newVersion.save((err, project) => {
-              res.send('new actor added');
+      const newActor = new Actor({
+        actorName: actorName,
+        actorDescription: actorDescription,
+        userStoreis: []
+      })
 
-            })
-          } else {
-            res.send(err);
-          }
-        });
-      }
-    })
+      newActor.save((err, project) => {
+        if (!err) {
+
+          newVersion.allActors.push(newActor);
+          newVersion.save((err, project) => {
+            res.send('new actor added');
+
+          })
+        } else {
+          res.send(err);
+        }
+      });
+    } else {
+      res.send(err);
+    }
+  })
 });
 
 
-  // === edit actor ===
+// === edit actor ===
 
-  router.put('/editActor/:actorID', function (req, res) {
+router.put('/editActor/:actorID', function (req, res) {
 
-    let { actorName, actorDescription } = req.body;
+  let { actorName, actorDescription } = req.body;
 
-    Actor.findById(req.params.actorID, (err, actor) => {
-      
-      if (!err) {
-        console.log("actor", actor);
-        actor.set({ actorName: actorName , actorDescription : actorDescription });
+  Actor.findById(req.params.actorID, (err, actor) => {
 
-        actor.save((err, project) => {
-          if (!err) {
+    if (!err) {
+      actor.set({ actorName: actorName, actorDescription: actorDescription });
 
-              res.send('actor updated');
-            } else {
-            res.send(err);
-          }
-        });
+      actor.save((err, project) => {
+        if (!err) {
 
-      }
-    })
+          res.send('actor updated');
+        } else {
+          res.send(err);
+        }
+      });
+
+    }
+  })
 });
 
 // === deletting actor === 
 
 router.delete('/:versionId/:location', function (req, res) {
   Version.findById(req.params.versionId, (err, version) => {
+    if (!err) {
+      var actorId = version.allActors[req.params.location];
+      version.allActors.splice(req.params.location, 1);
+      version.save((err, project) => {
 
-    version.allActors.splice(req.params.location, 1);
-
-    version.save().then((result) => {
-      res.send('actor deleted');
-    }).catch((err) => {
-      res.send(err);
-    });
+        if (!err) {
+          Actor.findById(actorId , (err, actor)=>{
+            actor.userStoreis.map((id)=>{
+              deleteUserStory(id);
+            })
+            deleteActor(actorId, res)
+          })
+        } else {
+          res.send(err);
+        }
+      })
+    } else {
+      res.send(err)
+    }
   })
 });
 
+deleteUserStory =(userStoryId)=>{
+    UserStory.findByIdAndDelete(userStoryId , (err, story)=>{
+      story.save(err =>{
+        console.log(err);
+        
+      })
+    })
+}
 
-router.delete('/:actorId', function (req, res) {
-  Actor.findByIdAndDelete(req.params.actorId, (err, actor) => {
-
-    actor.save().then((result) => {
-      res.send('actor deleted');
-    }).catch((err) => {
-      res.send(err);
-    });
-  })
-});
+deleteActor =(actorId, res)=>{
+    Actor.findByIdAndDelete(actorId , (err, actor)=>{
+      actor.save(err =>{
+        res.send('actor deleted' )
+        
+      })
+    })
+}
 
 
 module.exports = router;

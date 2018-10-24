@@ -7,7 +7,8 @@ const Actor = require('../models/Actor');
 const UserStory = require('../models/UserStories');
 
 router.use(function timeLog(req, res, next) {
-    console.log('Time: ', Date.now())
+    console.log('hallo Shlomo ☺')
+
     next()
 })
 
