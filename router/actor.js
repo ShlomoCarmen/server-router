@@ -20,8 +20,6 @@ router.get('/allActors/:versionId', function (req, res) {
       Actor.find({ _id: version.allActors })
         .populate("allActors").exec((err, project) => {
           if (!err) {
-            console.log("aaaaaaaaaaaa", project);
-
             res.send(project);
           } else {
             res.send(err);
@@ -38,16 +36,15 @@ router.get('/allActors/:versionId', function (req, res) {
 
 router.put('/:versionID', function (req, res) {
 
-  let { actorName, actorDescription } = req.body;
+  let { name, description } = req.body;
 
   Version.findById(req.params.versionID, (err, newVersion) => {
-    console.log("newVersion", newVersion);
 
     if (!err) {
 
       const newActor = new Actor({
-        actorName: actorName,
-        actorDescription: actorDescription,
+        name: name,
+        description: description,
         userStoreis: []
       })
 
@@ -74,12 +71,12 @@ router.put('/:versionID', function (req, res) {
 
 router.put('/editActor/:actorID', function (req, res) {
 
-  let { actorName, actorDescription } = req.body;
+  let { name, description } = req.body;
 
   Actor.findById(req.params.actorID, (err, actor) => {
 
     if (!err) {
-      actor.set({ actorName: actorName, actorDescription: actorDescription });
+      actor.set({ name: name, description: description });
 
       actor.save((err, project) => {
         if (!err) {

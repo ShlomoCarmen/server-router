@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+const Subject = new Schema({
+  name: String,
+  description :String
+})
 
 const Version = new Schema({
   rejectionExplenation: String,
@@ -8,10 +12,7 @@ const Version = new Schema({
   projectDescription: String,
   projectName: String,
   versionNumber: Number,
-  subjects: [{
-    title: String,
-    subject: String
-  }],
+  subjects: [Subject],
   assumptions: [String],
   date: { type: Date, default: Date.now },
   allActors: [{type: mongoose.Schema.Types.ObjectId, ref: 'Actor'}]

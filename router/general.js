@@ -16,7 +16,6 @@ const UserStory = require('../models/UserStories');
 
 router.put('/projectDescription/:versionId', function (req, res) {
     Version.findById(req.params.versionId, (err, version) => {
-        console.log(version);
         if (!err) {
             version.set({ projectDescription: req.body.projectDescription });
             version.save((err, project) => {
@@ -56,7 +55,6 @@ router.put('/rejection/:versionId', function (req, res) {
 
 router.put('/assumptions/:versionId', function (req, res) {
     Version.findById(req.params.versionId, (err, version) => {
-        console.log(version);
         if (!err) {
             version.set({ assumptions: req.body.assumptions });
             version.save((err, project) => {
@@ -74,13 +72,14 @@ router.put('/assumptions/:versionId', function (req, res) {
 
 // === ading subjects to correct version ===
 
-router.put('/subjects/:versionId', function (req, res) {
+router.put('/subject/:versionId', function (req, res) {
     Version.findById(req.params.versionId, (err, version) => {
         if (!err) {
-            version.set({ subjects: req.body.subjects });
+            
+            version.subjects.push(req.body)
             version.save((err, project) => {
                 if (!err) {
-                    res.send("subjects added");
+                    res.send("subject added");
                 } else {
                     res.send(err);
                 }
