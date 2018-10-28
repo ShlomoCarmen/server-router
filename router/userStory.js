@@ -8,11 +8,6 @@ const UserStory = require('../models/UserStories');
 
 const deleteUserStory = require("./actor")
 
-// router.use(function timeLog(req, res, next) {
-//     console.log('hallo Shlomo ☺')
-
-//     next()
-// })
 
 //  === Adding user story to a specific Actor ===
 
@@ -87,10 +82,88 @@ router.get('/allStories/:actorId', function (req, res) {
     })
 });
 
-//        === getting all user stories ===
+//        === getting all user stories of specific project     ===
 
 
-// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+let counter = 0;
+
+addUserStoryToArr = (arr, userStory) => {
+    arr.map(subject => {
+        if (subject.subjectName === userStory.subject) {
+            subject.requirements.push(userStory);
+            counter++;
+
+        }
+    })
+}
+
+addSubjectsToArr = (version, subjectsArr) => {
+    version.subjects.map((sub, i) => {
+
+        let temp = {
+            subjectName: sub.name,
+            subjectDescreption: sub.description,
+            requirements: []
+        }
+        subjectsArr.push(temp)
+    })
+
+}
+var conntinue = true;
+let arrUserStoryID = [];
+
+getUserStoryById = (storyID, requirement, res) => {
+    UserStory.findById(storyID, (err, story) => {
+
+        addUserStoryToArr(requirement.subjects, story)
+
+    }).then(() => {
+        if (counter === arrUserStoryID.length && conntinue) {
+
+            res.send(requirement);
+            conntinue = false;
+        }
+    })
+}
+
+
+router.get('/reqSpec/:projectId', function (req, res) {
+    var conntinue = true;
+    counter = 0;
+
+    let requirement = {
+        projectName: '',
+        subjects: []
+    }
+
+
+    Project.findById(req.params.projectId, (err, project) => {
+        if (!err) {
+            requirement.projectName = project.projectName;
+            Version.findById(project.allVersions[project.allVersions.length - 1], (err, version) => {
+                if (!err) {
+                    addSubjectsToArr(version, requirement.subjects)
+
+                    version.allActors.map((actorId, index1) => {
+                        Actor.findById(actorId, (err, actor) => {
+                            actor.userStoreis.map((storyID, index2) => {
+
+                                getUserStoryById(storyID, requirement, res)
+                                arrUserStoryID.push(storyID)
+                            })
+                        })
+                    })
+                } else {
+
+                    res.send(err)
+                }
+            })
+
+        } else {
+            res.send(err)
+        }
+    })
+})
 
 
 //       === delete user story from a specific Actor ===

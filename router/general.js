@@ -53,13 +53,48 @@ router.put('/rejection/:versionId', function (req, res) {
 
 // === ading assumptions to correct version ===
 
-router.put('/assumptions/:versionId', function (req, res) {
+router.put('/generalAssumptions/:versionId', function (req, res) {
     Version.findById(req.params.versionId, (err, version) => {
         if (!err) {
-            version.set({ assumptions: req.body.assumptions });
+            version.set({ generalAssumptions: req.body.generalAssumptions });
             version.save((err, project) => {
                 if (!err) {
                     res.send("assumptions added");
+                } else {
+                    res.send(err);
+                }
+            })
+        } else {
+            res.send(err);
+        }
+    })
+});
+
+router.put('/assumption/:versionId', function (req, res) {
+    Version.findById(req.params.versionId, (err, version) => {
+        if (!err) {
+            version.currentAssumptions.push(req.body.assumption);
+            version.save((err, project) => {
+                if (!err) {
+                    res.send("assumptions added");
+                } else {
+                    res.send(err);
+                }
+            })
+        } else {
+            res.send(err);
+        }
+    })
+});
+
+//           === edit assumption ===
+router.put('/editAssumption/:versionId/:index', function (req, res) {
+    Version.findById(req.params.versionId, (err, version) => {
+        if (!err) {
+            version.currentAssumptions[req.params.index] = req.body.assumption;
+            version.save((err, project) => {
+                if (!err) {
+                    res.send("assumptions updated");
                 } else {
                     res.send(err);
                 }

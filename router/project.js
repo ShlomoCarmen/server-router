@@ -28,7 +28,8 @@ router.post("/newProject", function (req, res) {
                 rejectionExplenation: "",
                 editorName: req.body.editorName,
                 projectName: req.body.projectName,
-                assumptions: [],
+                generalAssumptions: [],
+                currentAssumptions: [],
                 subjects: [],
                 projectDescription: '',
                 versionNumber: 1,
@@ -56,7 +57,7 @@ router.post("/newProject", function (req, res) {
     })
 });
 
-//=== getting all data of current version of specific project ===
+//       === getting all data of current version of specific project ===
 
 router.get('/allData/:projctId', function (req, res) {
     Project.findOne({_id: req.params.projctId})
@@ -92,7 +93,8 @@ router.put('/newVersion/:projctId', function (req, res) {
             projectDescription: correntVersion.projectDescription,
             versionNumber: correntVersion.versionNumber + 1,
             allActors: correntVersion.allActors,
-            assumptions: correntVersion.assumptions,
+            generalAssumptions: correntVersion.assumptions,
+            currentAssumptions: correntVersion.currentAssumptions,
             subjects: correntVersion.subjects,
 
         })
