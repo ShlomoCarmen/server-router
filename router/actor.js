@@ -6,16 +6,11 @@ const Project = require('../models/Project');
 const Actor = require('../models/Actor');
 const UserStory = require('../models/UserStories');
 
-// router.use(function timeLog(req, res, next) {
-//   console.log('hallo Shlomo ☺')
-//   next()
-// })
 
 //  === getting all actors ===
 
 router.get('/allActors/:versionId', function (req, res) {
   Version.findById(req.params.versionId, (err, version) => {
-    console.log(version);
     if (!err) {
       Actor.find({ _id: version.allActors })
         .populate("allActors").exec((err, project) => {
@@ -45,7 +40,8 @@ router.put('/:versionID', function (req, res) {
       const newActor = new Actor({
         name: name,
         description: description,
-        userStoreis: []
+        userStoreis: [],
+        userStoreisArr: []
       })
 
       newActor.save((err, project) => {

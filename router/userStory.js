@@ -97,6 +97,7 @@ addUserStoryToArr = (arr, userStory) => {
     })
 }
 
+
 addSubjectsToArr = (version, subjectsArr) => {
     version.subjects.map((sub, i) => {
 
@@ -109,7 +110,7 @@ addSubjectsToArr = (version, subjectsArr) => {
     })
 
 }
-var conntinue = true;
+
 let arrUserStoryID = [];
 
 getUserStoryById = (storyID, requirement, res) => {
@@ -118,10 +119,10 @@ getUserStoryById = (storyID, requirement, res) => {
         addUserStoryToArr(requirement.subjects, story)
 
     }).then(() => {
-        if (counter === arrUserStoryID.length && conntinue) {
-
+        if (counter === arrUserStoryID.length) {
+            
             res.send(requirement);
-            conntinue = false;
+            counter ++;
         }
     })
 }
