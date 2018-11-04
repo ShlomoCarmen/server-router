@@ -1,18 +1,16 @@
 const express = require('express');
 
 const router = express.Router();
-const Version = require('../models/Version');
 const Project = require('../models/Project');
-const Actor = require('../models/Actor');
-const UserStory = require('../models/UserStories');
 
 
 // === adding project description to correct version === 
 
-router.put('/projectDescription/:versionId', function (req, res) {
-    Version.findById(req.params.versionId, (err, version) => {
+router.put('/projectDescription/:projectId', function (req, res) {
+    Project.findById(req.params.projectId, (err, version) => {
         if (!err) {
-            version.set({ projectDescription: req.body.projectDescription });
+            let currentVersion = version.allVersions[version.allVersions.length - 1];
+            currentVersion.projectDescription = req.body.projectDescription
             version.save((err, project) => {
                 if (!err) {
                     res.send("project description added");
@@ -28,11 +26,11 @@ router.put('/projectDescription/:versionId', function (req, res) {
 
 // === ading rejection explenation to old version ===
 
-router.put('/rejection/:versionId', function (req, res) {
-    Version.findById(req.params.versionId, (err, version) => {
-
+router.put('/rejection/:projectId', function (req, res) {
+    Project.findById(req.params.projectId, (err, version) => {
         if (!err) {
-            version.set({ rejectionExplenation: req.body.rejectionExplenation });
+            let currentVersion = version.allVersions[version.allVersions.length - 1];
+            currentVersion.rejectionExplenation = req.body.rejectionExplenation
             version.save((err, project) => {
                 if (!err) {
                     res.send("rejection explenation added");
@@ -46,12 +44,14 @@ router.put('/rejection/:versionId', function (req, res) {
     })
 });
 
-// === ading assumptions to correct version ===
 
-router.put('/generalAssumptions/:versionId', function (req, res) {
-    Version.findById(req.params.versionId, (err, version) => {
+//  === adding general assumptions to correct version ===
+
+router.put('/generalAssumptions/:projectId', function (req, res) {
+    Project.findById(req.params.projectId, (err, version) => {
         if (!err) {
-            version.set({ generalAssumptions: req.body.generalAssumptions });
+            let currentVersion = version.allVersions[version.allVersions.length - 1];
+            currentVersion.generalAssumptions = req.body.generalAssumptions
             version.save((err, project) => {
                 if (!err) {
                     res.send("assumptions added");
@@ -65,10 +65,13 @@ router.put('/generalAssumptions/:versionId', function (req, res) {
     })
 });
 
-router.put('/assumption/:versionId', function (req, res) {
-    Version.findById(req.params.versionId, (err, version) => {
+//  === adding manual assumptions to correct version ===
+
+router.put('/assumption/:projectId', function (req, res) {
+    Project.findById(req.params.projectId, (err, version) => {
         if (!err) {
-            version.currentAssumptions.push(req.body.assumption);
+            let currentVersion = version.allVersions[version.allVersions.length - 1];
+            currentVersion.currentAssumptions.push(req.body.assumption)
             version.save((err, project) => {
                 if (!err) {
                     res.send("assumptions added");
@@ -83,12 +86,33 @@ router.put('/assumption/:versionId', function (req, res) {
 });
 
 
-// === delete assumptions from correct version ===
+//             === edit assumption ===
 
-router.delete('/assumption/:versionId/:index', function (req, res) {
-    Version.findById(req.params.versionId, (err, version) => {
+router.put('/assumption/:projectId/:index', function (req, res) {
+    Project.findById(req.params.projectId, (err, version) => {
         if (!err) {
-            version.currentAssumptions.splice(req.params.index, 1);
+            let currentVersion = version.allVersions[version.allVersions.length - 1];
+            currentVersion.currentAssumptions.splice(req.params.index, 1, req.body.assumption)
+            version.save((err, project) => {
+                if (!err) {
+                    res.send("assumptions updated");
+                } else {
+                    res.send(err);
+                }
+            })
+        } else {
+            res.send(err);
+        }
+    })
+});
+    
+//    === delete assumptions from correct version ===
+
+router.delete('/assumption/:projectId/:index', function (req, res) {
+    Project.findById(req.params.projectId, (err, version) => {
+        if (!err) {
+            let currentVersion = version.allVersions[version.allVersions.length - 1];
+            currentVersion.currentAssumptions.splice(req.params.index, 1)
             version.save((err, project) => {
                 if (!err) {
                     res.send("assumptions deleted");
@@ -102,36 +126,14 @@ router.delete('/assumption/:versionId/:index', function (req, res) {
     })
 });
 
-//           === edit assumption ===
-router.put('/assumption/:versionId/:index', function (req, res) {
-    Version.findById(req.params.versionId, (err, version) => {
+
+//      === ading subjects to correct version ===
+
+router.put('/subject/:projectId', function (req, res) {
+    Project.findById(req.params.projectId, (err, version) => {
         if (!err) {
-
-            version.currentAssumptions.splice(req.params.index, 1, req.body.assumption);
-
-            version.save((err, version) => {
-                console.log(version);
-
-                if (!err) {
-                    res.send("assumptions updated");
-                } else {
-                    res.send(err);
-                }
-            })
-        } else {
-            res.send(err);
-        }
-    })
-  
-});
-
-// === ading subjects to correct version ===
-
-router.put('/subject/:versionId', function (req, res) {
-    Version.findById(req.params.versionId, (err, version) => {
-        if (!err) {
-
-            version.subjects.push(req.body)
+            let currentVersion = version.allVersions[version.allVersions.length - 1];
+            currentVersion.subjects.push(req.body)
             version.save((err, project) => {
                 if (!err) {
                     res.send("subject added");

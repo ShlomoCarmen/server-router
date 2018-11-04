@@ -1,0 +1,19 @@
+{
+    "milestone": [
+        {
+            "milstoneName": "",
+            "container": [
+                {
+                    "name": "",
+                    "days": "Number",
+                    "tasks": [
+                        {
+                            "task": "",
+                            "days": "Number"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

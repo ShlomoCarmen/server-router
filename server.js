@@ -10,11 +10,7 @@ const userStory = require('./router/userStory');
 const app = express();
 
 const Project = require('./models/Project');
-const Version = require('./models/Version');
-const Actor = require('./models/Actor');
-const UserStory = require('./models/UserStories');
-
-const mongoURI = 'mongodb://127.0.0.1/scoper-router';
+const mongoURI = 'mongodb://127.0.0.1/Project-Scoper-DB';
 
 mongoose.connect(mongoURI, { useNewUrlParser: true })
     .then(() => console.log('connection successful'))
@@ -30,4 +26,4 @@ app.use('/api/general', general);
 app.use('/api/userStory', userStory);
 
 
-app.listen(5500);
+app.listen(5000);

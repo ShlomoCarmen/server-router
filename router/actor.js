@@ -1,57 +1,31 @@
 const express = require('express');
 
 const router = express.Router();
-const Version = require('../models/Version');
 const Project = require('../models/Project');
-const Actor = require('../models/Actor');
-const UserStory = require('../models/UserStories');
 
 
-//  === getting all actors ===
+//           === creating new actor ===
 
-router.get('/allActors/:versionId', function (req, res) {
-  Version.findById(req.params.versionId, (err, version) => {
-    if (!err) {
-      Actor.find({ _id: version.allActors })
-        .populate("allActors").exec((err, project) => {
-          if (!err) {
-            res.send(project);
-          } else {
-            res.send(err);
-          }
-        })
-
-    } else {
-      res.send(err);
-    }
-  })
-});
-
-// === creating new actor ===
-
-router.put('/:versionID', function (req, res) {
+router.put('/:projectId', function (req, res) {
 
   let { name, description } = req.body;
 
-  Version.findById(req.params.versionID, (err, newVersion) => {
+  Project.findById(req.params.projectId, (err, project) => {
 
     if (!err) {
 
-      const newActor = new Actor({
+      const newActor = {
         name: name,
         description: description,
         userStoreis: [],
-        userStoreisArr: []
-      })
+      }
+      let currentVersion = project.allVersions[project.allVersions.length - 1];
+      currentVersion.allActors.push(newActor);
 
-      newActor.save((err, project) => {
+      project.save((err, version) => {
         if (!err) {
+          res.send('new actor added');
 
-          newVersion.allActors.push(newActor);
-          newVersion.save((err, project) => {
-            res.send('new actor added');
-
-          })
         } else {
           res.send(err);
         }
@@ -63,16 +37,19 @@ router.put('/:versionID', function (req, res) {
 });
 
 
-// === edit actor ===
+//    === edit actor ===
 
-router.put('/editActor/:actorID', function (req, res) {
+router.put('/:projectId/:index', function (req, res) {
 
   let { name, description } = req.body;
 
-  Actor.findById(req.params.actorID, (err, actor) => {
+  Project.findById(req.params.projectId, (err, actor) => {
 
     if (!err) {
-      actor.set({ name: name, description: description });
+      let currentActor = actor.allVersions[actor.allVersions.length - 1].allActors[req.params.index];
+      console.log('currentActor: ', currentActor);
+      currentActor.name = name;
+      currentActor.description = description;
 
       actor.save((err, project) => {
         if (!err) {
@@ -87,49 +64,31 @@ router.put('/editActor/:actorID', function (req, res) {
   })
 });
 
-// === deletting actor === 
+//     === deletting actor === 
 
-router.delete('/:versionId/:location', function (req, res) {
-  Version.findById(req.params.versionId, (err, version) => {
+router.delete('/:projectId/:index', function (req, res) {
+
+  Project.findById(req.params.projectId, (err, actor) => {
+
     if (!err) {
-      var actorId = version.allActors[req.params.location];
-      version.allActors.splice(req.params.location, 1);
-      version.save((err, project) => {
+      let allActors = actor.allVersions[actor.allVersions.length - 1].allActors;
+      allActors.splice(req.params.index, 1);
 
+      actor.save((err, project) => {
         if (!err) {
-          Actor.findById(actorId , (err, actor)=>{
-            actor.userStoreis.map((id)=>{
-              deleteUserStory(id);
-            })
-            deleteActor(actorId, res)
-          })
+
+          res.send('actor deleted');
         } else {
           res.send(err);
         }
-      })
-    } else {
+      });
+
+    }else{
       res.send(err)
     }
   })
 });
 
-deleteUserStory =(userStoryId)=>{
-    UserStory.findByIdAndDelete(userStoryId , (err, story)=>{
-      story.save(err =>{
-        console.log(err);
-        
-      })
-    })
-}
-
-deleteActor =(actorId, res)=>{
-    Actor.findByIdAndDelete(actorId , (err, actor)=>{
-      actor.save(err =>{
-        res.send('actor deleted' )
-        
-      })
-    })
-}
 
 
 module.exports = router;
